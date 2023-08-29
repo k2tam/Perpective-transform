@@ -24,7 +24,7 @@ class ViewController: UIViewController {
                 // Set the  m34 value for 3D effect
                 let perspective: CGFloat = 1.0 / 200.0  // Negative value for inward perspective
                 transformContainer.m34 = perspective
-                transformContainer = CATransform3DRotate(transformContainer, CGFloat(-20 * Double.pi / 180), 1, 0, 0)
+                transformContainer = CATransform3DRotate(transformContainer, CGFloat(-25 * Double.pi / 180), 1, 0, 0)
                 
             }else {
                 //Remove 3D transformation
@@ -32,13 +32,14 @@ class ViewController: UIViewController {
             }
             
             animateTransform()
-            
+        
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         vm = ViewModel()
+        setupGridView()
         setupViews()
         setupAnimation()
     }
@@ -46,29 +47,48 @@ class ViewController: UIViewController {
     func setupViews() {
         guard let vm = vm else {return}
         
-        vm.addADeviceView(containerView: containerView,deviceID: 1 ,deviceName: "Iphone", coordinate: CGPoint(x: 60, y: 140), width: 30, height: 60)
-        vm.addADeviceView(containerView: containerView,deviceID: 2, deviceName: "Mac 1", coordinate: CGPoint(x: 300, y: 110), width: 60, height: 40)
-        vm.addADeviceView(containerView: containerView,deviceID: 3, deviceName: "Mac 2", coordinate: CGPoint(x: 150, y: 200), width: 60, height: 40)
         
-        vm.addADeviceView(containerView: containerView,deviceID: 4, deviceName: "Mac 3", coordinate: CGPoint(x: 300, y: 400), width: 60, height: 40)
-        vm.addADeviceView(containerView: containerView,deviceID: 5, deviceName: "Mac 4", coordinate: CGPoint(x: 300, y: 400), width: 60, height: 40)
-        vm.addADeviceView(containerView: containerView,deviceID: 6, deviceName: "Mac 5", coordinate: CGPoint(x: 200, y: 500), width: 60, height: 40)
+        vm.addADeviceView(
+            containerView: containerView,
+            device: Device(id: 1, name: "Iphone X", status: .green, deviceImg: DeviceImg.iphone),
+            coordinate: CGPoint(x: 60, y: 410),
+            size: CGSize(width: 80, height: 70))
         
+        vm.addADeviceView(
+            containerView: containerView,
+            device: Device(id: 2, name: "Macbook", status: .green, deviceImg: DeviceImg.macbook),
+            coordinate: CGPoint(x: 250, y: 500),
+            size: CGSize(width: 90, height: 80))
         
-        for device in vm.devices {
-            let deviceViewFrame = device.view.frame
+        vm.addADeviceView(
+            containerView: containerView,
+            device: Device(id: 3, name: "Iphone X", status: .yellow, deviceImg: DeviceImg.iphone),
+            coordinate: CGPoint(x: 110, y: 300),
+            size: CGSize(width: 80, height: 70))
+        
+        vm.addADeviceView(
+            containerView: containerView,
+            device: Device(id: 4, name: "Iphone X", status: .red, deviceImg: DeviceImg.iphone),
+            coordinate: CGPoint(x: 250, y: 100),
+            size: CGSize(width: 80, height: 70))
+        
+     
+        
+        for deviceView in vm.deviceViews {
+            //            let deviceViewFrame = deviceView.view.frame
             
             //Point in containerView coordinate system
-            let point = UIView(frame: CGRect(origin: containerView.convert(deviceViewFrame.origin, from: containerView.superview), size: CGSize(width: 5, height: 5) ) )
+            let point = UIView(frame: CGRect(origin: containerView.convert(deviceView.view
+                .frame.origin, from: containerView.superview), size: CGSize(width: 5, height: 5) ) )
             
-            let pointOfDevice = Point(id: device.id, view: point,oriCoordinate: device.view.frame.origin)
+            let pointOfDevice = Point(id: deviceView.id, view: point,oriCoordinate: deviceView.view.frame.origin)
             vm.points.append(pointOfDevice)
             
             
-            device.view.center = pointOfDevice.oriCoordinate
+            deviceView.view.center = pointOfDevice.oriCoordinate
             
             containerView.addSubview(point)
-            self.view.addSubview(device.view)
+            self.view.addSubview(deviceView.view)
         }
         
     }
@@ -95,7 +115,7 @@ class ViewController: UIViewController {
                 point.transCoordinate = transformedPointCoordinates
             }
             
-            let deviceOfThisPoint = vm.devices.first { device in
+            let deviceOfThisPoint = vm.deviceViews.first { device in
                 device.id == point.id
             }
             
@@ -118,7 +138,7 @@ class ViewController: UIViewController {
                 
                 if point.transCoordinate!.y >= containerViewCenterY {
                     // Scale the subviews from centerY to bottom
-                    scaleFactor = 1.0 + min(max((point.transCoordinate!.y - containerViewCenterY) / containerViewCenterY, 0), 0.5)
+                    scaleFactor = 1.0 + min(max((point.transCoordinate!.y - containerViewCenterY) / containerViewCenterY, 0), 0.3)
                 } else {
                     // Scale the subviews from centerY to top
                     scaleFactor = 1.0 - min(max((containerViewCenterY - point.transCoordinate!.y) / containerViewCenterY, 0), 0.5)
@@ -131,7 +151,7 @@ class ViewController: UIViewController {
             }
             else {
                 containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 1).isActive = true
-
+                
                 
                 positionAnimation.fromValue = NSValue(cgPoint: pointTransCoordinate)
                 positionAnimation.toValue = NSValue(cgPoint: point.oriCoordinate)
@@ -140,17 +160,14 @@ class ViewController: UIViewController {
             }
             
             deviceOfThisPoint.view.layer.add(positionAnimation, forKey: nil)
-          
-            
-            
-            
+
         }
     }
     
-    
-    
     @IBAction func transformPressed(_ sender: UIButton) {
+        
         is3D = !is3D
+        view.bringSubviewToFront(sender)
     }
     
 }
@@ -162,6 +179,13 @@ extension ViewController {
         
         positionAnimation.duration = 0.65
         containerAnimation.duration = 0.6
+    }
+    
+    /// Setup grid for container view background
+    private func setupGridView() {
+        let gridView = GridView(frame: containerView.bounds)
+        gridView.backgroundColor = .clear
+        containerView.addSubview(gridView)
         
     }
     

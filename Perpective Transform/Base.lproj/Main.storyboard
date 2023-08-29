@@ -16,10 +16,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EYU-ME-s6X">
-                                <rect key="frame" x="0.0" y="69" width="393" height="664"/>
-                                <color key="backgroundColor" systemColor="systemIndigoColor"/>
-                            </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dhr-SH-nQF">
                                 <rect key="frame" x="145.66666666666666" y="753" width="102" height="35"/>
                                 <state key="normal" title="Button"/>
@@ -28,6 +24,9 @@
                                     <action selector="transformPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="EzF-Fp-9ov"/>
                                 </connections>
                             </button>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EYU-ME-s6X">
+                                <rect key="frame" x="-98.333333333333314" y="69" width="589.66666666666663" height="604"/>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -36,9 +35,9 @@
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="Dhr-SH-nQF" secondAttribute="bottom" constant="30" id="I3O-J9-DhT"/>
                             <constraint firstItem="EYU-ME-s6X" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="nOb-xa-0oD"/>
                             <constraint firstItem="EYU-ME-s6X" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="sCY-iu-nIG"/>
-                            <constraint firstItem="EYU-ME-s6X" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="wUn-hA-tsb"/>
+                            <constraint firstItem="EYU-ME-s6X" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" multiplier="1.5" id="wUn-hA-tsb"/>
                             <constraint firstItem="Dhr-SH-nQF" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="xK6-L0-7UK"/>
-                            <constraint firstItem="Dhr-SH-nQF" firstAttribute="top" secondItem="EYU-ME-s6X" secondAttribute="bottom" constant="20" id="ygJ-kW-UEB"/>
+                            <constraint firstItem="Dhr-SH-nQF" firstAttribute="top" secondItem="EYU-ME-s6X" secondAttribute="bottom" constant="80" id="ygJ-kW-UEB"/>
                         </constraints>
                     </view>
                     <connections>
@@ -53,9 +52,6 @@
     <resources>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemIndigoColor">
-            <color red="0.34509803921568627" green="0.33725490196078434" blue="0.83921568627450982" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

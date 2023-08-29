@@ -8,11 +8,30 @@
 import Foundation
 import UIKit
 
+enum DeviceStatus {
+    case green
+    case yellow
+    case red
+}
+
+enum DeviceImg: String {
+    case iphone = "iphone_X"
+    case macbook = "macbook"
+    case samsung = "samsung"
+}
+
 struct Device {
     var id: Int
     var name: String
-    var view: UIView 
-    let oriSize: CGSize
+    var status: DeviceStatus
+    var deviceImg: DeviceImg
+}
+
+struct DeviceViewModel {
+    var id: Int
+    var view: UIView
+    var coordinate: CGPoint
+
 }
 
 class Point {
