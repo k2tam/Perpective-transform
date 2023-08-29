@@ -11,7 +11,8 @@ import UIKit
 struct Device {
     var id: Int
     var name: String
-    var view: UIView
+    var view: UIView 
+    let oriSize: CGSize
 }
 
 class Point {
