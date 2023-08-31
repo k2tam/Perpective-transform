@@ -2,33 +2,69 @@
 //  CircleView.swift
 //  Perpective Transform
 //
-//  Created by k2 tam on 29/08/2023.
+//  Created by k2 tam on 30/08/2023.
 //
+
 
 import UIKit
 
 class CircleView: UIView {
-    override func layoutSubviews() {
-        super.layoutSubviews()
+    let gradientStartPoint: CGPoint
+    let gradientEndPoint: CGPoint
+    
+    // Override the designated initializer of UIView
+    override init(frame: CGRect) {
+        self.gradientStartPoint = CGPoint(x: 0.5, y: 0)
+        self.gradientEndPoint = CGPoint(x: 0.5, y: 0.15)
         
-        // Remove any existing sublayers
-        layer.sublayers?.forEach { $0.removeFromSuperlayer() }
+        super.init(frame: frame)
+    }
+    
+    init(frame: CGRect, gradientStartPoint: CGPoint, gradientEndPoint: CGPoint) {
+        self.gradientStartPoint = gradientStartPoint
+        self.gradientEndPoint = gradientEndPoint
+
+
+        super.init(frame: frame)
         
-        // Create a circular shape layer
-        let circleLayer = CAShapeLayer()
-        let center = CGPoint(x: bounds.midX, y: bounds.midY)
-        let radius = min(bounds.width, bounds.height) / 2.0
+        self.backgroundColor = UIColor.clear
+
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
+    
+    override func draw(_ rect: CGRect) {
         
-        // Create a circular path
-        let path = UIBezierPath(arcCenter: center, radius: radius, startAngle: 0, endAngle: CGFloat.pi * 2, clockwise: true)
-        circleLayer.path = path.cgPath
+        let circlePath = UIBezierPath(ovalIn: rect)
+        let gradientLayer = CAGradientLayer()
         
-        // Customize the appearance of the circle
-        circleLayer.fillColor = UIColor.clear.cgColor
-        circleLayer.strokeColor = UIColor.red.cgColor
-        circleLayer.lineWidth = 2.0
         
-        // Add the circle layer to the view's layer
-        layer.addSublayer(circleLayer)
+        let gradientColors: [CGColor] = [
+            UIColor(red: 217/255, green: 217/255, blue: 217/255, alpha: 0.20).cgColor,
+            UIColor(red: 217/255, green: 217/255, blue: 217/255, alpha: 0.15).cgColor,
+            UIColor(red: 217/255, green: 217/255, blue: 217/255, alpha: 0).cgColor,
+        ]
+        
+        gradientLayer.locations = [0,0.1,0.2,1]
+        gradientLayer.frame = bounds
+        gradientLayer.colors = gradientColors
+        gradientLayer.startPoint = self.gradientStartPoint
+        gradientLayer.endPoint = self.gradientEndPoint
+        
+
+        
+        let shapeLayer = CAShapeLayer()
+        shapeLayer.path = circlePath.cgPath
+        
+        gradientLayer.mask = shapeLayer
+        
+        layer.addSublayer(gradientLayer)
+        
+        
+        
     }
 }

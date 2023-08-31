@@ -18,6 +18,7 @@ enum DeviceImg: String {
     case iphone = "iphone_X"
     case macbook = "macbook"
     case samsung = "samsung"
+    case modem = "modem"
 }
 
 struct Device {

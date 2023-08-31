@@ -16,8 +16,12 @@ class GridView: UIView {
         let numberOfRows = Int(rect.height / gridSize)
         
         let context = UIGraphicsGetCurrentContext()
-        context?.setStrokeColor(UIColor.lightGray.cgColor)
+//        context?.setStrokeColor(UIColor.lightGray.cgColor)
         context?.setLineWidth(0.5)
+        
+        // Set the stroke color with alpha
+        let strokeColor = UIColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 0.25).cgColor
+        context?.setStrokeColor(strokeColor)
         
         // Vertical lines
         for column in 1..<numberOfColumns {

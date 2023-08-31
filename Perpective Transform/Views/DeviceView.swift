@@ -44,7 +44,7 @@ class DeviceView: UIView {
         case .yellow:
             deviceStatusView.backgroundColor = .yellow
         case .red:
-            deviceStatusView.backgroundColor = .green
+            deviceStatusView.backgroundColor = .red
         }
     }
     
