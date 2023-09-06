@@ -92,51 +92,97 @@ class ViewModel {
         
         let centerOfLanDevices =  calculateLansCenters(parentView: containerView, modemCenterPoint: modemCenterPoint, deviceConnectLans: lanDevices)
         
-        
-        for i in 0...lanDevices.count - 1{
+        if lanDevices.count == 1 {
+            let lanDevice = lanDevices[0]
             
-            let lanDevice = lanDevices[i]
-            
-            addADeviceView( device: lanDevices[i], coordinate: centerOfLanDevices[i], size: DeviceSize.macbook.size)
-            
+            addADeviceView( device: lanDevice, coordinate: centerOfLanDevices[0], size: DeviceSize.macbook.size)
+
             let pointOfLanDevice = points.first { point in
-            
                 return point.id == lanDevice.id
-                
             }
 
             guard let pointOfLanDevice = pointOfLanDevice else {
                 return
             }
+
+
+            addAStraightLanLine(startPoint: modemCenterPoint, endPoint: pointOfLanDevice.view.frame.origin)
+
             
-            
-           
-            
-           
         }
+        
+        else{
+            for i in 0...lanDevices.count - 1{
+
+                let lanDevice = lanDevices[i]
+
+                addADeviceView( device: lanDevices[i], coordinate: centerOfLanDevices[i], size: DeviceSize.macbook.size)
+
+                let pointOfLanDevice = points.first { point in
+                    return point.id == lanDevice.id
+                }
+
+                guard let pointOfLanDevice = pointOfLanDevice else {
+                    return
+                }
+
+                if pointOfLanDevice.view.frame.origin.x == modemCenterPoint.x {
+                    addAStraightLanLine(startPoint: modemCenterPoint, endPoint: pointOfLanDevice.view.frame.origin)
+                }else {
+
+                    addACurvedLanLine(
+                        startPoint: modemCenterPoint,
+                        endPoint: pointOfLanDevice.view.frame.origin)
+                }
+
+            }
+        }
+        
+    }
     
+
+    func addAStraightLanLine(startPoint: CGPoint, endPoint: CGPoint){
+        let line = CAShapeLayer()
+        let path = UIBezierPath()
+
+        line.frame = CGRect(x: 0, y: 0, width: 0, height: 0)
+        path.move(to: startPoint)
+        path.lineWidth = 2.0
+        line.fillColor = nil
+        line.strokeColor = UIColor.blue.cgColor
+
+        path.addLine(to: endPoint)
+        
+        path.close()
+        line.path = path.cgPath
+        containerView.layer.insertSublayer(line, at: 0)
 
     }
     
-    
-    /// Function to draw curved lan line from start poin to end point
-    /// - Parameters:
-    ///   - startPoint: start point
-    ///   - endPoint: endpoint
-    private func addALanLineFromStartPointtoEndPoint(startPoint: CGPoint, endPoint: CGPoint) {
+     func addACurvedLanLine(startPoint: CGPoint, endPoint: CGPoint) {
         let line = CAShapeLayer()
         
         line.frame = CGRect(x: 0, y: 0, width: 0, height: 0)
         let path = UIBezierPath()
+
+        path.move(to: startPoint)
         
-        let localStartPoint = CGPoint(x: startPoint.x, y: startPoint.y)
         
-        path.move(to: localStartPoint)
         let radius = 20.0
-        
-        let center = CGPoint(x: endPoint.x +  radius, y: localStartPoint.y + radius)
-        
-        path.addArc(withCenter: CGPoint(x: center.x, y: center.y), radius: radius, startAngle: 3 * CGFloat.pi / 2, endAngle: CGFloat.pi, clockwise: false)
+        var centerOfArc = CGPoint()
+         
+         if(endPoint.x > startPoint.x){
+             centerOfArc = CGPoint(x: endPoint.x - radius, y: startPoint.y + radius)
+             path.addArc(withCenter: CGPoint(x: centerOfArc.x, y: centerOfArc.y), radius: radius, startAngle: 3 * CGFloat.pi / 2, endAngle: 2 * CGFloat.pi, clockwise: true)
+         }else{
+              centerOfArc = CGPoint(x: endPoint.x +  radius, y: startPoint.y + radius)
+             
+             path.addArc(withCenter: CGPoint(x: centerOfArc.x, y: centerOfArc.y), radius: radius, startAngle: 3 * CGFloat.pi / 2, endAngle: CGFloat.pi, clockwise: false)
+         }
+         
+       
+      
+       
         
         path.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y))
         
@@ -147,7 +193,6 @@ class ViewModel {
         
         line.path = path.cgPath
         
-        path.close()
         
         containerView.layer.insertSublayer(line, at: 0)
     }
@@ -167,7 +212,7 @@ class ViewModel {
         let containerWidth = UIScreen.main.bounds.width - padding * 2
         
         //Vertical space between modem to devices
-        let verticalSpaceBetweenModemToDevices = 100.0
+        let verticalSpaceBetweenModemToDevices = 180.0
         
         let yCenterOfDevices = modemCenterPoint.y + verticalSpaceBetweenModemToDevices
         

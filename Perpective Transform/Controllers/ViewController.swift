@@ -75,27 +75,21 @@ class ViewController: UIViewController {
             coordinate: CGPoint(x: 250, y: 100),
             size: DeviceSize.iphoneX.size)
         
-//        vm.addADeviceView(
-//            containerView: containerView,
-//            device: Device(id: 2, name: "Macbook", status: .green, deviceImg: DeviceImg.macbook),
-//            coordinate: CGPoint(x: 100, y: 530),
-//            size: CGSize(width: 90, height: 80))
-        
 
-        
         var pointOfModem = vm.points.first(where: { point in
             return point.id == 1
         })
         
         
         
-//        var lanDevices = [
-//            Device(id: 5, name: "PC", status: .green, deviceImg: .macbook),
-//            Device(id: 6, name: "PC 2", status: .green, deviceImg: .macbook),
-//
-//        ]
-////
-//        vm.drawLanLines(modemCenterPoint: pointOfModem!.oriCoordinate, lanDevices: lanDevices)
+        var lanDevices = [
+            Device(id: 5, name: "PC", status: .green, deviceImg: .macbook),
+            Device(id: 6, name: "PC 2", status: .green, deviceImg: .macbook),
+            Device(id: 7, name: "PC 3", status: .green, deviceImg: .macbook),
+
+        ]
+
+        vm.drawLanLines(modemCenterPoint: pointOfModem!.view.frame.origin, lanDevices: lanDevices)
 
     }
     
