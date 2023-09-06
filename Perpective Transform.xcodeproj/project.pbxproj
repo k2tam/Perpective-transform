@@ -18,6 +18,7 @@
 		052C9A132A96E77100A744B6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 052C9A112A96E77100A744B6 /* LaunchScreen.storyboard */; };
 		052C9A5A2A98890900A744B6 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052C9A592A98890900A744B6 /* Models.swift */; };
 		052C9A612A988D2000A744B6 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052C9A602A988D2000A744B6 /* ViewModel.swift */; };
+		05791B632AA8189400678B19 /* Lan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05791B622AA8189400678B19 /* Lan.swift */; };
 		05AA6EBC2A9DA20500938BEC /* DeviceView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05AA6EBB2A9DA20500938BEC /* DeviceView.xib */; };
 		05AA6EBE2A9DA22E00938BEC /* DeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AA6EBD2A9DA22E00938BEC /* DeviceView.swift */; };
 /* End PBXBuildFile section */
@@ -36,6 +37,7 @@
 		052C9A142A96E77100A744B6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		052C9A592A98890900A744B6 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		052C9A602A988D2000A744B6 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
+		05791B622AA8189400678B19 /* Lan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lan.swift; sourceTree = "<group>"; };
 		05AA6EBB2A9DA20500938BEC /* DeviceView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeviceView.xib; sourceTree = "<group>"; };
 		05AA6EBD2A9DA22E00938BEC /* DeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -89,6 +91,7 @@
 			isa = PBXGroup;
 			children = (
 				052C9A592A98890900A744B6 /* Models.swift */,
+				05791B622AA8189400678B19 /* Lan.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -195,6 +198,7 @@
 				05178CEA2A9F005F0000E4F9 /* CircleView.swift in Sources */,
 				052C9A0B2A96E77000A744B6 /* ViewController.swift in Sources */,
 				052C9A072A96E77000A744B6 /* AppDelegate.swift in Sources */,
+				05791B632AA8189400678B19 /* Lan.swift in Sources */,
 				05AA6EBE2A9DA22E00938BEC /* DeviceView.swift in Sources */,
 				05178C9C2A9DDF940000E4F9 /* GridView.swift in Sources */,
 				052C9A092A96E77000A744B6 /* SceneDelegate.swift in Sources */,

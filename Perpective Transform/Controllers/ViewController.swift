@@ -11,18 +11,14 @@ class ViewController: UIViewController {
     @IBOutlet weak var containerView: UIView!
     
     let gridView = GridView()
-
     
     var vm: ViewModel?
-    
-    
     
     let containerAnimation = CABasicAnimation(keyPath: "transform")
     let positionAnimation = CABasicAnimation(keyPath: "position")
     
     var transformContainer = CATransform3DIdentity
     var originalDeviceViewCenter: CGPoint = .zero
-    
     var dotViewOriginalCenter: CGPoint = .zero
     
     
@@ -46,7 +42,8 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        vm = ViewModel()
+        vm = ViewModel(containerView: containerView)
+        vm?.delegate = self
         
         setupCircleViews()
         setupGridView()
@@ -58,73 +55,48 @@ class ViewController: UIViewController {
     func setupViews() {
         guard let vm = vm else {return}
         
-        
-        
-        
         vm.addADeviceView(
-            containerView: containerView,
-            device: Device(id: 1, name: "Iphone X", status: .green, deviceImg: DeviceImg.iphone),
+            device: Device(id: 1, name: "EP9108W-4FE", status: .green, deviceImg: DeviceImg.modem),
+            coordinate: view.center,
+            size: DeviceSize.modem.size)
+
+        vm.addADeviceView(
+            device: Device(id: 2, name: "Iphone X", status: .green, deviceImg: DeviceImg.iphone),
             coordinate: CGPoint(x: 90, y: 390),
-            size: CGSize(width: 80, height: 70))
+            size: DeviceSize.iphoneX.size)
         
         vm.addADeviceView(
-            containerView: containerView,
             device: Device(id: 3, name: "Iphone X", status: .yellow, deviceImg: DeviceImg.iphone),
             coordinate: CGPoint(x: 110, y: 300),
-            size: CGSize(width: 80, height: 70))
+            size: DeviceSize.iphoneX.size)
         
         vm.addADeviceView(
-            containerView: containerView,
             device: Device(id: 4, name: "Iphone X", status: .red, deviceImg: DeviceImg.iphone),
             coordinate: CGPoint(x: 250, y: 100),
-            size: CGSize(width: 80, height: 70))
+            size: DeviceSize.iphoneX.size)
         
-        vm.addADeviceView(
-            containerView: containerView,
-            device: Device(id: 2, name: "Macbook", status: .green, deviceImg: DeviceImg.macbook),
-            coordinate: CGPoint(x: 100, y: 530),
-            size: CGSize(width: 90, height: 80))
+//        vm.addADeviceView(
+//            containerView: containerView,
+//            device: Device(id: 2, name: "Macbook", status: .green, deviceImg: DeviceImg.macbook),
+//            coordinate: CGPoint(x: 100, y: 530),
+//            size: CGSize(width: 90, height: 80))
         
-        vm.addADeviceView(
-            containerView: containerView,
-            device: Device(id: 5, name: "EP9108W-4FE", status: .green, deviceImg: DeviceImg.modem),
-            coordinate: view.center,
-            size: CGSize(width: 100, height: 100))
-        
-        
-        
-        
-        
-        for deviceView in vm.deviceViews {
-            //            let deviceViewFrame = deviceView.view.frame
-            
-            //Point in containerView coordinate system
-            let point = UIView(frame: CGRect(origin: containerView.convert(deviceView.view
-                .frame.origin, from: containerView.superview), size: CGSize(width: 5, height: 5) ) )
-            
-            let pointOfDevice = Point(id: deviceView.id, view: point,oriCoordinate: deviceView.view.frame.origin)
-            vm.points.append(pointOfDevice)
-            
-            
-            deviceView.view.center = pointOfDevice.oriCoordinate
-            
-            containerView.addSubview(point)
-            self.view.addSubview(deviceView.view)
 
-        }
         
         var pointOfModem = vm.points.first(where: { point in
-            return point.id == 5
+            return point.id == 1
         })
         
-        var pointOfMac = vm.points.first { point in
-            return point.id == 2
-        }
         
-        addLanLine(startPoint: pointOfModem!.view.frame.origin, endPoint: pointOfMac!.view
-            .frame.origin)
+        
+//        var lanDevices = [
+//            Device(id: 5, name: "PC", status: .green, deviceImg: .macbook),
+//            Device(id: 6, name: "PC 2", status: .green, deviceImg: .macbook),
+//
+//        ]
+////
+//        vm.drawLanLines(modemCenterPoint: pointOfModem!.oriCoordinate, lanDevices: lanDevices)
 
-        
     }
     
     func animateTransform() {
@@ -182,19 +154,15 @@ class ViewController: UIViewController {
                 
                 // Apply the scaling factor to the subview
                 deviceOfThisPoint.view.transform = CGAffineTransform(scaleX: scaleFactor, y: scaleFactor)
-                
-                
+   
             }
             else {
                 
-                
                 positionAnimation.fromValue = NSValue(cgPoint: pointTransCoordinate)
                 positionAnimation.toValue = NSValue(cgPoint: point.oriCoordinate)
+                
                 deviceOfThisPoint.view.center = point.oriCoordinate
                 deviceOfThisPoint.view.transform = .identity
-                
-                
-                
             }
             
             deviceOfThisPoint.view.layer.add(positionAnimation, forKey: nil)
@@ -203,7 +171,6 @@ class ViewController: UIViewController {
     }
     
     @IBAction func transformPressed(_ sender: UIButton) {
-        
         is3D = !is3D
         
         if(is3D){
@@ -272,38 +239,12 @@ extension ViewController {
    
         containerView.addSubViews(circle1,circle2, circle3)
     }
-    
-    func addLanLine(startPoint: CGPoint, endPoint: CGPoint) {
-        let line = CAShapeLayer()
-        
-        let controlPoint = CGPoint(x: endPoint.x, y: startPoint.y)
-        
-        line.frame = CGRect(x: 0, y: 0, width: 0, height: 0)
+}
 
-        
-        let path = UIBezierPath()
-        
-        let localStartPoint = CGPoint(x: startPoint.x, y: startPoint.y + 10)
-        
-        path.move(to: localStartPoint)
-        path.addQuadCurve(to: endPoint, controlPoint: controlPoint)
-        
-//        path.addLine(to: endPoint)
-        
-        
-        line.fillColor = nil
-        path.lineWidth = 2.0
-        line.strokeColor = UIColor.blue.cgColor
-        path.stroke()
-        
-        line.path = path.cgPath
-        
-        
-          
-
-        
-        containerView.layer.insertSublayer(line, at: 0)
+extension ViewController: ViewModelDelegate {
+    func completeSetupPointAndDeviceView(deviceView: UIView) {
+        self.view.addSubview(deviceView)
     }
-    
+
 }
 

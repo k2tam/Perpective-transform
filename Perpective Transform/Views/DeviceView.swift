@@ -12,7 +12,6 @@ class DeviceView: UIView {
 
     @IBOutlet var contentView: UIView!
     
-    
     @IBOutlet weak var deviceImageView: UIImageView!
     @IBOutlet weak var deviceStatusView: UIView!
     @IBOutlet weak var deviceLabelView: UILabel!
@@ -48,14 +47,10 @@ class DeviceView: UIView {
         }
     }
     
-    
     // Calculate the width that fits the label's content
-    private func getWidthThatFitTextInLabel(label: UILabel) {
+     func getWidthThatFitTextInLabel(label: UILabel) {
         let fittingSize = label.intrinsicContentSize
         let widthThatFits = fittingSize.width
-        
-        contentView.frame.size.width = widthThatFits + 50
-
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -64,7 +59,6 @@ class DeviceView: UIView {
     }
     
 }
-
 
 extension UIView
 {
