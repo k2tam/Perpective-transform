@@ -23,13 +23,13 @@ enum DeviceImg: String {
 }
 
 enum DeviceSize {
-    case iphoneX
+    case iphone
     case macbook
     case modem
     
     var size: CGSize {
         switch self {
-        case .iphoneX:
+        case .iphone:
             return CGSize(width: 80, height: 70)
         case .modem:
             return CGSize(width: 100, height: 100)
@@ -40,11 +40,37 @@ enum DeviceSize {
     }
 }
 
+enum DeviceType {
+    case iphone
+    case macbook
+    case samsung
+    case modem
+    case pc
+}
+
 struct Device {
     var id: Int
     var name: String
     var status: DeviceStatus
+    var deviceType: DeviceType
     var deviceImg: DeviceImg
+    
+    var deviceSize: CGSize {
+        switch deviceType {
+        case .iphone:
+            return DeviceSize.iphone.size
+        case .macbook:
+            return DeviceSize.macbook.size
+        case .samsung:
+            return DeviceSize.iphone.size
+        case .modem:
+            return DeviceSize.modem.size
+        case .pc:
+            return DeviceSize.modem.size
+        }
+    }
+    
+    
 }
 
 struct DeviceViewModel {

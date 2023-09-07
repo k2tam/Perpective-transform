@@ -35,7 +35,7 @@ class ViewModel {
     ///   - width: width of device view
     ///   - height: height of device view
 
-    func addADeviceView( device: Device ,coordinate: CGPoint, size: CGSize) {
+    func addADeviceView( device: Device ,coordinate: CGPoint) {
         
         let containerFrame = containerView.frame
         
@@ -46,7 +46,7 @@ class ViewModel {
         if containerFrame.contains(coordinate) {
             
             // Create and configure the device view
-            setupDeviceView(from: device, coordinate: coordinate, size: size)
+            setupDeviceView(from: device, coordinate: coordinate, size: device.deviceSize)
         } else {
             print("Coordinate of deviceID: \(device.id) is outside the bounds of the container view")
         }
@@ -55,17 +55,15 @@ class ViewModel {
     
     /// Setup device view frame center to its point
     /// - Parameters:
-    ///   - device: <#device description#>
-    ///   - coordinate: <#coordinate description#>
-    ///   - size: <#size description#>
+    ///   - device: Device object
+    ///   - coordinate: coordinate center of device view to screen coordinatex`
     private func setupDeviceView(from device: Device, coordinate: CGPoint, size: CGSize) {
         let deviceView = DeviceView()
         
-        
-//        deviceView.frame = CGRect(x: coordinate.x, y: coordinate.y, width: size.width, height: size.height)
-        deviceView.frame = CGRect(x: coordinate.x, y: coordinate.y, width: size.width, height: size.height)
         deviceView.configure(from: device)
         
+        let widthDeviceFrameFitLabel =  deviceView.getWidthThatFitTextInLabel() + 20
+        deviceView.frame = CGRect(x: coordinate.x, y: coordinate.y, width: widthDeviceFrameFitLabel, height: size.height)
         
         let deviceViewModel = DeviceViewModel(id: device.id, view: deviceView, coordinate: coordinate)
         
@@ -80,22 +78,33 @@ class ViewModel {
 
         
         deviceViewModel.view.center = pointOfDevice.oriCoordinate
-
-        delegate?.completeSetupPointAndDeviceView(deviceView: deviceViewModel.view)
         
+        delegate?.completeSetupPointAndDeviceView(deviceView: deviceViewModel.view)
         deviceViews.append(DeviceViewModel(id: device.id, view: deviceView, coordinate: coordinate))
     }
+    
+    /// Function setup lan devices and the lan lines connect to its
+    /// - Parameters:
+    ///   - modemCenterPoint: CGPoint center of modem view
+    ///   - lanDevices: List of lan devices
+    func setupLanDevicesAndLanLines(modemCenterPoint: CGPoint,lanDevices: [Device]){
+        
+        //Vertical space between modem to devices
+        let verticalSpaceBetweenModemToDevices = 165.0
+        
+        //Calculate the arranged centers point of lan devices
+        let centerOfLanDevices =  calculateLansCenters(parentView: containerView, modemCenterPoint: modemCenterPoint, verticalSpaceBetweenModemToDevices: verticalSpaceBetweenModemToDevices, deviceConnectLans: lanDevices)
+        
+        let startPointOfLanLines = CGPoint(x: modemCenterPoint.x, y: modemCenterPoint.y + 12)
+//                let startPointOfLanLines = CGPoint(x: modemCenterPoint.x, y: modemCenterPoint.y )
 
-    
-    
-    func drawLanLines(modemCenterPoint: CGPoint,lanDevices: [Device]){
         
-        let centerOfLanDevices =  calculateLansCenters(parentView: containerView, modemCenterPoint: modemCenterPoint, deviceConnectLans: lanDevices)
         
+        //Case just have one device then draw a straight lan line
         if lanDevices.count == 1 {
             let lanDevice = lanDevices[0]
             
-            addADeviceView( device: lanDevice, coordinate: centerOfLanDevices[0], size: DeviceSize.macbook.size)
+            addADeviceView( device: lanDevice, coordinate: centerOfLanDevices[0])
 
             let pointOfLanDevice = points.first { point in
                 return point.id == lanDevice.id
@@ -104,19 +113,20 @@ class ViewModel {
             guard let pointOfLanDevice = pointOfLanDevice else {
                 return
             }
-
-
-            addAStraightLanLine(startPoint: modemCenterPoint, endPoint: pointOfLanDevice.view.frame.origin)
-
             
+            let spaceEndpointLanLineToDevice = lanDevice.deviceSize.height / 2  -  10
+            
+            addAStraightLanLine(spaceToLanDevice: spaceEndpointLanLineToDevice, startPoint: startPointOfLanLines, endPoint: pointOfLanDevice.view.frame.origin)
+
         }
         
         else{
             for i in 0...lanDevices.count - 1{
 
                 let lanDevice = lanDevices[i]
-
-                addADeviceView( device: lanDevices[i], coordinate: centerOfLanDevices[i], size: DeviceSize.macbook.size)
+                let spaceEndpointLanLineToDevice = lanDevice.deviceSize.height / 2 - 10
+                
+                addADeviceView( device: lanDevices[i], coordinate: centerOfLanDevices[i])
 
                 let pointOfLanDevice = points.first { point in
                     return point.id == lanDevice.id
@@ -127,21 +137,19 @@ class ViewModel {
                 }
 
                 if pointOfLanDevice.view.frame.origin.x == modemCenterPoint.x {
-                    addAStraightLanLine(startPoint: modemCenterPoint, endPoint: pointOfLanDevice.view.frame.origin)
+                    addAStraightLanLine(spaceToLanDevice: spaceEndpointLanLineToDevice, startPoint: startPointOfLanLines, endPoint: pointOfLanDevice.view.frame.origin)
                 }else {
 
                     addACurvedLanLine(
-                        startPoint: modemCenterPoint,
+                        spaceToLanDevice: spaceEndpointLanLineToDevice, startPoint: startPointOfLanLines,
                         endPoint: pointOfLanDevice.view.frame.origin)
                 }
-
             }
         }
         
     }
     
-
-    func addAStraightLanLine(startPoint: CGPoint, endPoint: CGPoint){
+    func addAStraightLanLine(spaceToLanDevice: CGFloat,startPoint: CGPoint, endPoint: CGPoint){
         let line = CAShapeLayer()
         let path = UIBezierPath()
 
@@ -150,8 +158,7 @@ class ViewModel {
         path.lineWidth = 2.0
         line.fillColor = nil
         line.strokeColor = UIColor.blue.cgColor
-
-        path.addLine(to: endPoint)
+        path.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y - spaceToLanDevice))
         
         path.close()
         line.path = path.cgPath
@@ -159,7 +166,7 @@ class ViewModel {
 
     }
     
-     func addACurvedLanLine(startPoint: CGPoint, endPoint: CGPoint) {
+     func addACurvedLanLine(spaceToLanDevice: CGFloat, startPoint: CGPoint, endPoint: CGPoint) {
         let line = CAShapeLayer()
         
         line.frame = CGRect(x: 0, y: 0, width: 0, height: 0)
@@ -167,33 +174,37 @@ class ViewModel {
 
         path.move(to: startPoint)
         
-        
         let radius = 20.0
         var centerOfArc = CGPoint()
          
+         //Case lan device is at half right screen draw right curved line
          if(endPoint.x > startPoint.x){
              centerOfArc = CGPoint(x: endPoint.x - radius, y: startPoint.y + radius)
-             path.addArc(withCenter: CGPoint(x: centerOfArc.x, y: centerOfArc.y), radius: radius, startAngle: 3 * CGFloat.pi / 2, endAngle: 2 * CGFloat.pi, clockwise: true)
+             path.addArc(
+                withCenter: CGPoint(x: centerOfArc.x, y: centerOfArc.y),
+                radius: radius, startAngle: 3 * CGFloat.pi / 2,
+                endAngle: 2 * CGFloat.pi, clockwise: true
+             )
          }else{
+             //Case lan device is at half left screen draw right curved line
               centerOfArc = CGPoint(x: endPoint.x +  radius, y: startPoint.y + radius)
              
-             path.addArc(withCenter: CGPoint(x: centerOfArc.x, y: centerOfArc.y), radius: radius, startAngle: 3 * CGFloat.pi / 2, endAngle: CGFloat.pi, clockwise: false)
+             path.addArc(
+                withCenter: CGPoint(x: centerOfArc.x, y: centerOfArc.y),
+                radius: radius, startAngle: 3 * CGFloat.pi / 2,
+                endAngle: CGFloat.pi, clockwise: false
+             )
          }
          
-       
-      
-       
-        
-        path.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y))
+        path.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y - spaceToLanDevice))
         
         line.fillColor = nil
         path.lineWidth = 2.0
         line.strokeColor = UIColor.blue.cgColor
-        path.stroke()
         
         line.path = path.cgPath
-        
-        
+        path.close()
+
         containerView.layer.insertSublayer(line, at: 0)
     }
     
@@ -201,18 +212,17 @@ class ViewModel {
     /// Func to  calculate centers of  lan devices
     /// - Parameters:
     ///   - parentView: the parent view containt modem and lan devices
+    ///   - verticalSpaceBetweenModemToDevices: fdfhdj
     ///   - modemCenterPoint: center point of modem
     ///   - deviceConnectLans: List of devices connect to modem 
     /// - Returns: Center point of lan devices
-    func calculateLansCenters(parentView: UIView ,modemCenterPoint: CGPoint ,deviceConnectLans: [Device]) -> [CGPoint] {
+    func calculateLansCenters(parentView: UIView ,modemCenterPoint: CGPoint ,verticalSpaceBetweenModemToDevices: CGFloat ,deviceConnectLans: [Device]) -> [CGPoint] {
         
         var centerPointOfLanDevices: [CGPoint] = []
         
         let padding = 10.0
         let containerWidth = UIScreen.main.bounds.width - padding * 2
         
-        //Vertical space between modem to devices
-        let verticalSpaceBetweenModemToDevices = 180.0
         
         let yCenterOfDevices = modemCenterPoint.y + verticalSpaceBetweenModemToDevices
         
@@ -225,7 +235,6 @@ class ViewModel {
                     x: (spacingOfDevicesCenter * CGFloat(i)) + padding,
                     y: yCenterOfDevices
                 ))
-            
         }
    
         return centerPointOfLanDevices

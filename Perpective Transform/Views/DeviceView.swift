@@ -23,6 +23,8 @@ class DeviceView: UIView {
         
         deviceStatusView.layer.cornerRadius = deviceStatusView.bounds.height / 2
         deviceStatusView.clipsToBounds = true
+        
+        deviceImageView.contentMode = .scaleAspectFit
     }
     
     func commonInit() {
@@ -34,8 +36,9 @@ class DeviceView: UIView {
     public func configure(from device: Device){
         deviceImageView.image =  UIImage(named: device.deviceImg.rawValue)
         
+        
         deviceLabelView.text = device.name
-        getWidthThatFitTextInLabel(label: deviceLabelView)
+        getWidthThatFitTextInLabel()
         
         switch device.status {
         case .green:
@@ -48,9 +51,9 @@ class DeviceView: UIView {
     }
     
     // Calculate the width that fits the label's content
-     func getWidthThatFitTextInLabel(label: UILabel) {
-        let fittingSize = label.intrinsicContentSize
-        let widthThatFits = fittingSize.width
+     func getWidthThatFitTextInLabel() -> CGFloat{
+        let fittingSize = deviceLabelView.intrinsicContentSize
+        return fittingSize.width
     }
     
     required init?(coder aDecoder: NSCoder) {

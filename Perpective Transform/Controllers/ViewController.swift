@@ -17,22 +17,46 @@ class ViewController: UIViewController {
     let containerAnimation = CABasicAnimation(keyPath: "transform")
     let positionAnimation = CABasicAnimation(keyPath: "position")
     
-    var transformContainer = CATransform3DIdentity
+    var transformMatrix = CATransform3DIdentity
     var originalDeviceViewCenter: CGPoint = .zero
     var dotViewOriginalCenter: CGPoint = .zero
     
+    //MARK: - 2 finger pan gesture to switch 2D/3D mode
+    lazy var gesture: UIPanGestureRecognizer = {
+        let gesture = UIPanGestureRecognizer(target: self, action: #selector(twoFingerDidSwipe(recognizer:)))
+        gesture.minimumNumberOfTouches = 2
+        gesture.maximumNumberOfTouches = 2
+        return gesture
+    }()
+    
+    @objc func twoFingerDidSwipe(recognizer: UIPanGestureRecognizer) {
+        let swipeThreshold: CGFloat = 50
+
+        if recognizer.state == .changed { // 1
+            switch recognizer.translation(in: UIApplication.shared.keyWindow).y { // 2
+          case ...(-swipeThreshold):
+            print("Swipe Up")
+            recognizer.state = .cancelled // 3
+          case swipeThreshold...:
+            print("Swipe Down")
+            recognizer.state = .cancelled
+          default:
+            break
+          }
+        }
+    }
     
     var is3D = false {
         didSet {
             if is3D {
                 // Set the  m34 value for 3D effect
                 let perspective: CGFloat = 1.0 / 200.0  // Negative value for inward perspective
-                transformContainer.m34 = perspective
-                transformContainer = CATransform3DRotate(transformContainer, CGFloat(-25 * Double.pi / 180), 1, 0, 0)
+                transformMatrix.m34 = perspective
+                transformMatrix = CATransform3DRotate(transformMatrix, CGFloat(-25 * Double.pi / 180), 1, 0, 0)
                 
             }else {
                 //Remove 3D transformation
-                transformContainer = CATransform3DIdentity
+                transformMatrix = CATransform3DIdentity
             }
             
             animateTransform()
@@ -54,42 +78,35 @@ class ViewController: UIViewController {
     
     func setupViews() {
         guard let vm = vm else {return}
-        
         vm.addADeviceView(
-            device: Device(id: 1, name: "EP9108W-4FE", status: .green, deviceImg: DeviceImg.modem),
-            coordinate: view.center,
-            size: DeviceSize.modem.size)
+            device: Device(id: 1, name: "EP9108W-4FE", status: .green, deviceType: .modem, deviceImg: DeviceImg.modem),
+            coordinate: CGPoint(x: view.center.x, y: view.center.y + 30))
 
         vm.addADeviceView(
-            device: Device(id: 2, name: "Iphone X", status: .green, deviceImg: DeviceImg.iphone),
-            coordinate: CGPoint(x: 90, y: 390),
-            size: DeviceSize.iphoneX.size)
+            device: Device(id: 2, name: "Iphone X", status: .green, deviceType: .iphone, deviceImg: DeviceImg.iphone),
+            coordinate: CGPoint(x: 90, y: 390))
         
         vm.addADeviceView(
-            device: Device(id: 3, name: "Iphone X", status: .yellow, deviceImg: DeviceImg.iphone),
-            coordinate: CGPoint(x: 110, y: 300),
-            size: DeviceSize.iphoneX.size)
+            device: Device(id: 3, name: "Iphone X", status: .yellow, deviceType: .iphone, deviceImg: DeviceImg.iphone),
+            coordinate: CGPoint(x: 110, y: 300))
         
         vm.addADeviceView(
-            device: Device(id: 4, name: "Iphone X", status: .red, deviceImg: DeviceImg.iphone),
-            coordinate: CGPoint(x: 250, y: 100),
-            size: DeviceSize.iphoneX.size)
+            device: Device(id: 4, name: "Iphone X", status: .red, deviceType: .iphone, deviceImg: DeviceImg.iphone),
+            coordinate: CGPoint(x: 250, y: 100))
         
 
         var pointOfModem = vm.points.first(where: { point in
             return point.id == 1
         })
         
-        
-        
         var lanDevices = [
-            Device(id: 5, name: "PC", status: .green, deviceImg: .macbook),
-            Device(id: 6, name: "PC 2", status: .green, deviceImg: .macbook),
-            Device(id: 7, name: "PC 3", status: .green, deviceImg: .macbook),
+            Device(id: 5, name: "Macbook", status: .green, deviceType: .macbook, deviceImg: .macbook),
+            Device(id: 6, name: "Macbook", status: .green, deviceType: .macbook, deviceImg: .macbook),
+            Device(id: 7, name: "PC 3", status: .green, deviceType: .macbook, deviceImg: .macbook),
 
         ]
 
-        vm.drawLanLines(modemCenterPoint: pointOfModem!.view.frame.origin, lanDevices: lanDevices)
+        vm.setupLanDevicesAndLanLines(modemCenterPoint: pointOfModem!.view.frame.origin, lanDevices: lanDevices)
 
     }
     
@@ -97,12 +114,12 @@ class ViewController: UIViewController {
         guard let vm = vm else {return}
         
         containerAnimation.fromValue = NSValue(caTransform3D: containerView.layer.transform)
-        containerAnimation.toValue = NSValue(caTransform3D: transformContainer)
+        containerAnimation.toValue = NSValue(caTransform3D: transformMatrix)
         // Animation duration in seconds
         containerView.layer.add(containerAnimation, forKey: nil)
         
         // Apply the final transform after the animation completes
-        containerView.layer.transform = transformContainer
+        containerView.layer.transform = transformMatrix
         
         let containerViewCenterY = containerView.frame.height / 2
         
@@ -151,7 +168,6 @@ class ViewController: UIViewController {
    
             }
             else {
-                
                 positionAnimation.fromValue = NSValue(cgPoint: pointTransCoordinate)
                 positionAnimation.toValue = NSValue(cgPoint: point.oriCoordinate)
                 
@@ -181,7 +197,7 @@ class ViewController: UIViewController {
 
 extension ViewController {
     func setupAnimation() {
-        containerAnimation.toValue = NSValue(caTransform3D:transformContainer)
+        containerAnimation.toValue = NSValue(caTransform3D:transformMatrix)
         containerAnimation.duration = 3
         
         positionAnimation.duration = 0.65
@@ -216,7 +232,7 @@ extension ViewController {
         
         let signalViewCenter2 = CGPoint(x: centerContainerViewX, y: startLineOfSignal - 150)
         let circle2 = CircleView(
-            frame: CGRect(x: 0, y: 0, width: 450, height: 450),
+            frame: CGRect(x: 0, y: 0, width: 500, height: 450),
             gradientStartPoint: CGPoint(x: 0.5, y: 0),
             gradientEndPoint: CGPoint(x: 0.5, y: 1))
 
@@ -224,7 +240,7 @@ extension ViewController {
         
         let signalViewCenter3 = CGPoint(x: centerContainerViewX, y: startLineOfSignal - 300)
         let circle3 = CircleView(
-            frame: CGRect(x: 0, y: 0, width: 450, height: 450),
+            frame: CGRect(x: 0, y: 0, width: 600, height: 450),
             gradientStartPoint: CGPoint(x: 0.5, y: 0),
             gradientEndPoint: CGPoint(x: 0.5, y: 1))
 
