@@ -62,14 +62,14 @@ class ViewModel {
         
         deviceView.configure(from: device)
         
-        let widthDeviceFrameFitLabel =  deviceView.getWidthThatFitTextInLabel() + 20
-        deviceView.frame = CGRect(x: coordinate.x, y: coordinate.y, width: widthDeviceFrameFitLabel, height: size.height)
+//        let widthDeviceFrameFitLabel =  deviceView.getWidthThatFitTextInLabel() + 20
+        deviceView.frame = CGRect(x: coordinate.x, y: coordinate.y, width: size.width, height: size.height)
         
         let deviceViewModel = DeviceViewModel(id: device.id, view: deviceView, coordinate: coordinate)
         
         //Point in containerView coordinate system
         let point = UIView(frame: CGRect(origin: containerView.convert(deviceViewModel.view
-            .frame.origin, from: containerView.superview), size: CGSize(width: 1, height: 1) ) )
+            .frame.origin, from: containerView.superview), size: CGSize(width: 2, height: 2) ) )
         
         let pointOfDevice = Point(id: deviceViewModel.id, view: point,oriCoordinate: deviceViewModel.view.frame.origin)
         
