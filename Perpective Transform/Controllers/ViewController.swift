@@ -22,27 +22,30 @@ class ViewController: UIViewController {
     var dotViewOriginalCenter: CGPoint = .zero
     
     //MARK: - 2 finger pan gesture to switch 2D/3D mode
-    lazy var gesture: UIPanGestureRecognizer = {
-        let gesture = UIPanGestureRecognizer(target: self, action: #selector(twoFingerDidSwipe(recognizer:)))
+    lazy var swipeGestureTogglePerpectiveMode: UIPanGestureRecognizer = {
+        let gesture = UIPanGestureRecognizer(target: self, action: #selector(twoFingerDidSwipe(_:)))
         gesture.minimumNumberOfTouches = 2
         gesture.maximumNumberOfTouches = 2
         return gesture
     }()
     
-    @objc func twoFingerDidSwipe(recognizer: UIPanGestureRecognizer) {
+    @objc func twoFingerDidSwipe(_ recognizer: UIPanGestureRecognizer) {
         let swipeThreshold: CGFloat = 50
 
-        if recognizer.state == .changed { // 1
-            switch recognizer.translation(in: UIApplication.shared.keyWindow).y { // 2
-          case ...(-swipeThreshold):
-            print("Swipe Up")
-            recognizer.state = .cancelled // 3
-          case swipeThreshold...:
-            print("Swipe Down")
-            recognizer.state = .cancelled
-          default:
-            break
-          }
+        if recognizer.state == .changed {
+            let translation = recognizer.translation(in: view)
+
+            if translation.y < -swipeThreshold {
+                // Swipe Up
+                if !is3D {
+                    is3D = true
+                }
+            } else if translation.y > swipeThreshold {
+                // Swipe Down
+                if is3D {
+                    is3D = false
+                }
+            }
         }
     }
     
@@ -53,16 +56,16 @@ class ViewController: UIViewController {
                 let perspective: CGFloat = 1.0 / 200.0  // Negative value for inward perspective
                 transformMatrix.m34 = perspective
                 transformMatrix = CATransform3DRotate(transformMatrix, CGFloat(-25 * Double.pi / 180), 1, 0, 0)
-                
             }else {
                 //Remove 3D transformation
                 transformMatrix = CATransform3DIdentity
             }
             
             animateTransform()
-            
         }
     }
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -74,6 +77,9 @@ class ViewController: UIViewController {
         
         setupViews()
         setupAnimation()
+        
+        // Add the two-finger pan gesture to the containerView
+        view.addGestureRecognizer(swipeGestureTogglePerpectiveMode)
     }
     
     func setupViews() {
@@ -103,6 +109,7 @@ class ViewController: UIViewController {
             Device(id: 5, name: "Macbook", status: .green, deviceType: .macbook, deviceImg: .macbook),
             Device(id: 6, name: "Macbook", status: .green, deviceType: .macbook, deviceImg: .macbook),
             Device(id: 7, name: "PC 3", status: .green, deviceType: .macbook, deviceImg: .macbook),
+            Device(id: 8, name: "PC 3", status: .green, deviceType: .macbook, deviceImg: .macbook),
 
         ]
 
@@ -189,7 +196,6 @@ class ViewController: UIViewController {
         }else{
             gridView.isHidden = true
         }
-        
         view.bringSubviewToFront(sender)
     }
     
@@ -212,7 +218,6 @@ extension ViewController {
         gridView.isHidden = true
         
     }
-    
     
     /// Setup circle views on container view
     private func setupCircleViews() {

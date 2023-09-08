@@ -34,23 +34,13 @@ class ViewModel {
     ///   - coordinate: coordinate center of device view to screen coordinate
     ///   - width: width of device view
     ///   - height: height of device view
-
     func addADeviceView( device: Device ,coordinate: CGPoint) {
-        
         let containerFrame = containerView.frame
         
         // Convert the given coordinate to a point within the containerView's coordinate system
         let coordinateToContainerView = containerView.convert(coordinate, from: containerView.superview)
         
-        // Check if the given coordinate is within the bounds of the container view
-        if containerFrame.contains(coordinate) {
-            
-            // Create and configure the device view
-            setupDeviceView(from: device, coordinate: coordinate, size: device.deviceSize)
-        } else {
-            print("Coordinate of deviceID: \(device.id) is outside the bounds of the container view")
-        }
-  
+        setupDeviceView(from: device, coordinate: coordinate, size: device.deviceSize)
     }
     
     /// Setup device view frame center to its point
@@ -75,7 +65,6 @@ class ViewModel {
         
         points.append(pointOfDevice)
         containerView.addSubview(point)
-
         
         deviceViewModel.view.center = pointOfDevice.oriCoordinate
         
@@ -96,10 +85,7 @@ class ViewModel {
         let centerOfLanDevices =  calculateLansCenters(parentView: containerView, modemCenterPoint: modemCenterPoint, verticalSpaceBetweenModemToDevices: verticalSpaceBetweenModemToDevices, deviceConnectLans: lanDevices)
         
         let startPointOfLanLines = CGPoint(x: modemCenterPoint.x, y: modemCenterPoint.y + 12)
-//                let startPointOfLanLines = CGPoint(x: modemCenterPoint.x, y: modemCenterPoint.y )
 
-        
-        
         //Case just have one device then draw a straight lan line
         if lanDevices.count == 1 {
             let lanDevice = lanDevices[0]
@@ -116,8 +102,10 @@ class ViewModel {
             
             let spaceEndpointLanLineToDevice = lanDevice.deviceSize.height / 2  -  10
             
-            addAStraightLanLine(spaceToLanDevice: spaceEndpointLanLineToDevice, startPoint: startPointOfLanLines, endPoint: pointOfLanDevice.view.frame.origin)
-
+            addAStraightLanLine(
+                spaceToLanDevice: spaceEndpointLanLineToDevice,
+                startPoint: startPointOfLanLines,
+                endPoint: pointOfLanDevice.view.frame.origin)
         }
         
         else{
@@ -137,11 +125,15 @@ class ViewModel {
                 }
 
                 if pointOfLanDevice.view.frame.origin.x == modemCenterPoint.x {
-                    addAStraightLanLine(spaceToLanDevice: spaceEndpointLanLineToDevice, startPoint: startPointOfLanLines, endPoint: pointOfLanDevice.view.frame.origin)
+                    addAStraightLanLine(
+                        spaceToLanDevice: spaceEndpointLanLineToDevice,
+                        startPoint: startPointOfLanLines,
+                        endPoint: pointOfLanDevice.view.frame.origin)
                 }else {
 
                     addACurvedLanLine(
-                        spaceToLanDevice: spaceEndpointLanLineToDevice, startPoint: startPointOfLanLines,
+                        spaceToLanDevice: spaceEndpointLanLineToDevice,
+                        startPoint: startPointOfLanLines,
                         endPoint: pointOfLanDevice.view.frame.origin)
                 }
             }
@@ -220,9 +212,8 @@ class ViewModel {
         
         var centerPointOfLanDevices: [CGPoint] = []
         
-        let padding = 10.0
+        let padding = 44.0
         let containerWidth = UIScreen.main.bounds.width - padding * 2
-        
         
         let yCenterOfDevices = modemCenterPoint.y + verticalSpaceBetweenModemToDevices
         
@@ -238,8 +229,6 @@ class ViewModel {
         }
    
         return centerPointOfLanDevices
-        
     }
-    
     
 }

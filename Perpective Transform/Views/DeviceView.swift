@@ -36,7 +36,6 @@ class DeviceView: UIView {
     public func configure(from device: Device){
         deviceImageView.image =  UIImage(named: device.deviceImg.rawValue)
         
-        
         deviceLabelView.text = device.name
         getWidthThatFitTextInLabel()
         
@@ -60,7 +59,6 @@ class DeviceView: UIView {
         super.init(coder: aDecoder)
         commonInit()
     }
-    
 }
 
 extension UIView
