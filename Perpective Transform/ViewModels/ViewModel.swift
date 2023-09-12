@@ -10,6 +10,9 @@ import UIKit
 
 protocol ViewModelDelegate: AnyObject {
     func completeSetupPointAndDeviceView(deviceView: UIView)
+    func drawSingalElipseWithRadius(radius: Double)
+    func addClientViewAfterDeterminedCoordinate(device: Device,coordinate: CGPoint)
+    
 }
 
 class ViewModel {
@@ -46,14 +49,15 @@ class ViewModel {
     /// Setup device view frame center to its point
     /// - Parameters:
     ///   - device: Device object
-    ///   - coordinate: coordinate center of device view to screen coordinatex`
+    ///   - coordinate: coordinate center of device view to screen cordinate
     private func setupDeviceView(from device: Device, coordinate: CGPoint, size: CGSize) {
         let deviceView = DeviceView()
         
         deviceView.configure(from: device)
         
-//        let widthDeviceFrameFitLabel =  deviceView.getWidthThatFitTextInLabel() + 20
-        deviceView.frame = CGRect(x: coordinate.x, y: coordinate.y, width: size.width, height: size.height)
+        //Set fit width for label deivce
+        let widthDeviceFrameFitLabel =  deviceView.getWidthThatFitTextInLabel() + 20
+        deviceView.frame = CGRect(x: coordinate.x, y: coordinate.y, width: widthDeviceFrameFitLabel, height: size.height)
         
         let deviceViewModel = DeviceViewModel(id: device.id, view: deviceView, coordinate: coordinate)
         
@@ -114,7 +118,7 @@ class ViewModel {
                 let lanDevice = lanDevices[i]
                 let spaceEndpointLanLineToDevice = lanDevice.deviceSize.height / 2 - 10
                 
-                addADeviceView( device: lanDevices[i], coordinate: centerOfLanDevices[i])
+                addADeviceView(device: lanDevices[i], coordinate: centerOfLanDevices[i])
 
                 let pointOfLanDevice = points.first { point in
                     return point.id == lanDevice.id
@@ -200,7 +204,6 @@ class ViewModel {
         containerView.layer.insertSublayer(line, at: 0)
     }
     
-    
     /// Func to  calculate centers of  lan devices
     /// - Parameters:
     ///   - parentView: the parent view containt modem and lan devices
@@ -230,5 +233,102 @@ class ViewModel {
    
         return centerPointOfLanDevices
     }
+    
+    //MARK: - Setup signal circle views
+    /// Setup circle views on container view
+     func setupCircleViews() {
+         devices.append(contentsOf: [
+            Device(id: 1, name: "Macbook", status: .green, deviceType: .macbook, deviceImg: DeviceImg.macbook),
+            Device(id: 2, name: "Iphone X", status: .green, deviceType: .iphone, deviceImg: DeviceImg.iphone),
+            Device(id: 3, name: "Iphone X", status: .green, deviceType: .iphone, deviceImg: DeviceImg.iphone),
+            Device(id: 0, name: "Iphone X", status: .green, deviceType: .iphone, deviceImg: DeviceImg.iphone),
+
+         ])
+        
+         
+        let pointOfModem = points.first(where: { point in
+             return point.id == 10
+        })
+         
+         guard let pointOfModem = pointOfModem else {
+             return
+         }
+        
+         
+         var circleStrongRadius = 120.0
+         
+         
+         
+         
+         
+        let circleStrong = CircleView(
+            frame: CGRect(x: 0, y: 0, width: circleStrongRadius * 2, height: circleStrongRadius * 2),
+            gradientStartPoint: CGPoint(x: 0.5, y: 0),
+            gradientEndPoint: CGPoint(x: 0.5, y: 1.5))
+        
+        circleStrong.center = pointOfModem.view.center
+  
+         
+         
+         
+//
+//        let circleMedium = CGPoint(x: centerContainerViewX, y: startLineOfSignal - 150)
+//        let circle2 = CircleView(
+//            frame: CGRect(x: 0, y: 0, width: 500, height: 450),
+//            gradientStartPoint: CGPoint(x: 0.5, y: 0),
+//            gradientEndPoint: CGPoint(x: 0.5, y: 1))
+
+        //        circle2.center = CGPoint(x: signalViewCenter2.x, y: signalViewCenter2.y)
+        //
+        //        let signalViewCenter3 = CGPoint(x: centerContainerViewX, y: startLineOfSignal - 300)
+        //        let circle3 = CircleView(
+        //            frame: CGRect(x: 0, y: 0, width: 600, height: 450),
+        //            gradientStartPoint: CGPoint(x: 0.5, y: 0),
+        //            gradientEndPoint: CGPoint(x: 0.5, y: 1))
+        //
+        //        circle3.center = CGPoint(x: signalViewCenter3.x, y: signalViewCenter3.y)
+        
+        
+        containerView.addSubViews(circleStrong)
+         
+         var strongDevices = devices.filter { device in
+             return device.status == .green
+         }
+         
+         drawClientsOnCircle(center: circleStrong, devices: strongDevices, maximumDevices: 4 ,radius: circleStrongRadius - 15.0)
+    }
+    
+    ///https://github.com/onmyway133/blog/issues/673
+    func drawClientsOnCircle(center: UIView, devices: [Device], maximumDevices: Int, radius: CGFloat) {
+        guard let delegate = delegate else {
+            return
+        }
+        
+        let numberOfDevices = devices.count
+        
+        if numberOfDevices < 1 {
+            return
+        }
+        
+        let startDegree =  Double.pi
+        let endDegree =  2 * Double.pi 
+//
+        
+        let degreeAllocation = (endDegree - startDegree) / Float64(numberOfDevices + 1)
+                                         
+        
+        for i in 0...numberOfDevices - 1{
+            let degree = degreeAllocation * Double(i + 1) + Double.pi + (startDegree - Double.pi)
+            let hOffSet = radius * cos(degree)
+            let vOffSet = radius * sin(degree)
+
+
+            delegate.addClientViewAfterDeterminedCoordinate(
+                device: devices[i],
+                coordinate: CGPoint(x: center.center.x + hOffSet,y: center.center.y + vOffSet)
+            )
+        }
+    }
+    
     
 }

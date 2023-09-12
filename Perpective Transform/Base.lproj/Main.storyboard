@@ -25,7 +25,7 @@
                                 </connections>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EYU-ME-s6X">
-                                <rect key="frame" x="0.0" y="60" width="393" height="603"/>
+                                <rect key="frame" x="0.0" y="90" width="393" height="573"/>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
@@ -36,7 +36,7 @@
                             <constraint firstItem="EYU-ME-s6X" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="wUn-hA-tsb"/>
                             <constraint firstItem="Dhr-SH-nQF" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="xK6-L0-7UK"/>
                             <constraint firstItem="Dhr-SH-nQF" firstAttribute="top" secondItem="EYU-ME-s6X" secondAttribute="bottom" constant="90" id="ygJ-kW-UEB"/>
-                            <constraint firstItem="EYU-ME-s6X" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="60" id="zQr-q5-6i1"/>
+                            <constraint firstItem="EYU-ME-s6X" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="90" id="zQr-q5-6i1"/>
                         </constraints>
                     </view>
                     <connections>

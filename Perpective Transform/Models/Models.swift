@@ -20,6 +20,7 @@ enum DeviceImg: String {
     case samsung = "samsung"
     case modem = "modem"
     case pc = "pc"
+    case wirelessCompression = "ic_wireless_compression"
 }
 
 enum DeviceSize {
@@ -46,6 +47,7 @@ enum DeviceType {
     case samsung
     case modem
     case pc
+    case wirelessCompression
 }
 
 struct Device {
@@ -67,10 +69,11 @@ struct Device {
             return DeviceSize.modem.size
         case .pc:
             return DeviceSize.modem.size
+        case .wirelessCompression:
+            return DeviceSize.iphone.size
         }
+        
     }
-    
-    
 }
 
 struct DeviceViewModel {

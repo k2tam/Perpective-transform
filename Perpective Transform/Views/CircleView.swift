@@ -28,6 +28,7 @@ class CircleView: UIView {
         super.init(frame: frame)
         
         self.backgroundColor = UIColor.clear
+        
 
     }
     
@@ -42,6 +43,11 @@ class CircleView: UIView {
         let circlePath = UIBezierPath(ovalIn: rect)
         let gradientLayer = CAGradientLayer()
         
+        
+        // Set the fill color to red
+//          UIColor.red.setFill()
+//          circlePath.fill()
+          
         
         let gradientColors: [CGColor] = [
             UIColor(red: 217/255, green: 217/255, blue: 217/255, alpha: 0.20).cgColor,

@@ -21,6 +21,8 @@ class ViewController: UIViewController {
     var originalDeviceViewCenter: CGPoint = .zero
     var dotViewOriginalCenter: CGPoint = .zero
     
+   
+    
     //MARK: - 2 finger pan gesture to switch 2D/3D mode
     lazy var swipeGestureTogglePerpectiveMode: UIPanGestureRecognizer = {
         let gesture = UIPanGestureRecognizer(target: self, action: #selector(twoFingerDidSwipe(_:)))
@@ -65,17 +67,17 @@ class ViewController: UIViewController {
         }
     }
     
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         vm = ViewModel(containerView: containerView)
         vm?.delegate = self
         
-        setupCircleViews()
         setupGridView()
         
         setupViews()
+        
+        
+        setAnchorPoint(anchorPoint: CGPoint(x: 0.5, y: 0.5), forView: containerView)
         setupAnimation()
         
         // Add the two-finger pan gesture to the containerView
@@ -85,36 +87,56 @@ class ViewController: UIViewController {
     func setupViews() {
         guard let vm = vm else {return}
         vm.addADeviceView(
-            device: Device(id: 1, name: "EP9108W-4FE", status: .green, deviceType: .modem, deviceImg: DeviceImg.modem),
+            device: Device(id: 10, name: "EP9108W-4FE", status: .green, deviceType: .modem, deviceImg: DeviceImg.modem),
             coordinate: CGPoint(x: view.center.x, y: view.center.y + 30))
 
-        vm.addADeviceView(
-            device: Device(id: 2, name: "Iphone X", status: .green, deviceType: .iphone, deviceImg: DeviceImg.iphone),
-            coordinate: CGPoint(x: 90, y: 390))
+//        vm.addADeviceView(
+//            device: Device(id: 2, name: "Iphone X", status: .green, deviceType: .iphone, deviceImg: DeviceImg.iphone),
+//            coordinate: CGPoint(x: 90, y: 390))
         
-        vm.addADeviceView(
-            device: Device(id: 3, name: "Iphone X", status: .yellow, deviceType: .iphone, deviceImg: DeviceImg.iphone),
-            coordinate: CGPoint(x: 110, y: 300))
-        
+//        vm.addADeviceView(
+//            device: Device(id: 3, name: "Iphone X", status: .yellow, deviceType: .iphone, deviceImg: DeviceImg.iphone),
+//            coordinate: CGPoint(x: 110, y: 300))
+    
         vm.addADeviceView(
             device: Device(id: 4, name: "Iphone X", status: .red, deviceType: .iphone, deviceImg: DeviceImg.iphone),
             coordinate: CGPoint(x: 250, y: 100))
         
 
         var pointOfModem = vm.points.first(where: { point in
-            return point.id == 1
+            return point.id == 10
         })
         
         var lanDevices = [
-            Device(id: 5, name: "Macbook", status: .green, deviceType: .macbook, deviceImg: .macbook),
-            Device(id: 6, name: "Macbook", status: .green, deviceType: .macbook, deviceImg: .macbook),
+            Device(id: 5, name: "PC 1", status: .green, deviceType: .macbook, deviceImg: .macbook),
+            Device(id: 6, name: "PC 2", status: .green, deviceType: .macbook, deviceImg: .macbook),
             Device(id: 7, name: "PC 3", status: .green, deviceType: .macbook, deviceImg: .macbook),
-            Device(id: 8, name: "PC 3", status: .green, deviceType: .macbook, deviceImg: .macbook),
+            Device(id: 8, name: "PC 4", status: .green, deviceType: .macbook, deviceImg: .macbook),
 
         ]
 
         vm.setupLanDevicesAndLanLines(modemCenterPoint: pointOfModem!.view.frame.origin, lanDevices: lanDevices)
-
+        
+        //Set up signal circle views
+        vm.setupCircleViews()
+    }
+    
+    func setAnchorPoint(anchorPoint: CGPoint, forView view: UIView) {
+        var newPoint = CGPointMake(view.bounds.size.width * anchorPoint.x, view.bounds.size.height * anchorPoint.y)
+        var oldPoint = CGPointMake(view.bounds.size.width * view.layer.anchorPoint.x, view.bounds.size.height * view.layer.anchorPoint.y)
+        
+        newPoint = CGPointApplyAffineTransform(newPoint, view.transform)
+        oldPoint = CGPointApplyAffineTransform(oldPoint, view.transform)
+        
+        var position = view.layer.position
+        position.x -= oldPoint.x
+        position.x += newPoint.x
+        
+        position.y -= oldPoint.y
+        position.y += newPoint.y
+        
+        view.layer.position = position
+        view.layer.anchorPoint = anchorPoint
     }
     
     func animateTransform() {
@@ -125,10 +147,20 @@ class ViewController: UIViewController {
         // Animation duration in seconds
         containerView.layer.add(containerAnimation, forKey: nil)
         
-        // Apply the final transform after the animation completes
+        // Apply the final transform after the animatßion completes
         containerView.layer.transform = transformMatrix
         
-        let containerViewCenterY = containerView.frame.height / 2
+        
+        let pointOfModem = vm.points.first(where: { point in
+             return point.id == 10
+        })
+        
+        guard let pointOfModem = pointOfModem else { return}
+//        let containerViewCenterY = containerView.frame.height / 2
+        
+        //Set center for scaling up down
+        let containerViewCenterY = pointOfModem.oriCoordinate.y
+
         
         
         // Get the point's coordinates within the parent view after transform
@@ -160,24 +192,39 @@ class ViewController: UIViewController {
                 
                 var scaleFactor: CGFloat = 1.0
                 
+                
+                
                 if point.transCoordinate!.y >= containerViewCenterY {
                     // Scale the subviews from centerY to bottom
-                    let scaleFactorRange: CGFloat = 0.3  // Adjust this range as needed
-                    scaleFactor = 1.0 + min(max((point.transCoordinate!.y - containerViewCenterY) / containerViewCenterY, 0), scaleFactorRange)
+                    let scaleFactorRange: CGFloat = 0.4  // Adjust this range as needed
+                    scaleFactor = 1.0 +
+                    min(
+                        max((point.transCoordinate!.y - containerViewCenterY) / containerViewCenterY, 0),
+                        scaleFactorRange
+                    )
                 } else {
                     // Scale the subviews from centerY to top
-                    let scaleFactorRange: CGFloat = 0.5  // Adjust this range as needed
-                    scaleFactor = 1.0 - min(max((containerViewCenterY - point.transCoordinate!.y) / containerViewCenterY, 0), scaleFactorRange)
+                    let scaleFactorRange: CGFloat = 0.4  // Adjust this range as needed
+                    scaleFactor = 1.0 -
+                    min(
+                        max((containerViewCenterY - point.transCoordinate!.y) / containerViewCenterY, 0),
+                        scaleFactorRange
+                    )
+                    
                 }
                 
                 // Apply the scaling factor to the subview
                 deviceOfThisPoint.view.transform = CGAffineTransform(scaleX: scaleFactor, y: scaleFactor)
+        
+                deviceOfThisPoint.view.alpha = scaleFactor
    
             }
             else {
                 positionAnimation.fromValue = NSValue(cgPoint: pointTransCoordinate)
                 positionAnimation.toValue = NSValue(cgPoint: point.oriCoordinate)
                 
+                deviceOfThisPoint.view.alpha = 1
+
                 deviceOfThisPoint.view.center = point.oriCoordinate
                 deviceOfThisPoint.view.transform = .identity
             }
@@ -218,47 +265,39 @@ extension ViewController {
         gridView.isHidden = true
         
     }
-    
-    /// Setup circle views on container view
-    private func setupCircleViews() {
-        
-        let centerContainerViewX = containerView.bounds.width / 2
-        
-        
-        let startLineOfSignal = containerView.bounds.height * 0.9
-        
-        let signalViewCenter = CGPoint(x: centerContainerViewX, y: containerView.bounds.height * 0.75)
-        let circle1 = CircleView(
-            frame: CGRect(x: 0, y: 0, width: 300, height: 300),
-            gradientStartPoint: CGPoint(x: 0.5, y: 0),
-            gradientEndPoint: CGPoint(x: 0.5, y: 1))
-        
-        circle1.center = CGPoint(x: signalViewCenter.x, y: signalViewCenter.y)
-        
-        let signalViewCenter2 = CGPoint(x: centerContainerViewX, y: startLineOfSignal - 150)
-        let circle2 = CircleView(
-            frame: CGRect(x: 0, y: 0, width: 500, height: 450),
-            gradientStartPoint: CGPoint(x: 0.5, y: 0),
-            gradientEndPoint: CGPoint(x: 0.5, y: 1))
-
-        circle2.center = CGPoint(x: signalViewCenter2.x, y: signalViewCenter2.y)
-        
-        let signalViewCenter3 = CGPoint(x: centerContainerViewX, y: startLineOfSignal - 300)
-        let circle3 = CircleView(
-            frame: CGRect(x: 0, y: 0, width: 600, height: 450),
-            gradientStartPoint: CGPoint(x: 0.5, y: 0),
-            gradientEndPoint: CGPoint(x: 0.5, y: 1))
-
-        circle3.center = CGPoint(x: signalViewCenter3.x, y: signalViewCenter3.y)
-        
-   
-        containerView.addSubViews(circle1,circle2, circle3)
-    }
 }
 
+
 extension ViewController: ViewModelDelegate {
+    func drawSingalElipseWithRadius(radius: Double) {
+        
+    }
+    
+    func addClientViewAfterDeterminedCoordinate(device: Device, coordinate: CGPoint) {
+        guard let vm = vm else {return}
+        
+        let coordinateInScreenSys = self.view.convert(coordinate, from: containerView)
+
+        vm.addADeviceView(
+            device: device,
+            coordinate: CGPoint(x: coordinateInScreenSys.x, y: coordinateInScreenSys.y))
+}
+    
     func completeSetupPointAndDeviceView(deviceView: UIView) {
         self.view.addSubview(deviceView)
+    }
+    
+    func drawSingalElipseWithRadius(radius: Double, center: CGPoint) {
+        let elipseSignalView: UIImageView = {
+            let image = UIImageView()
+            return image
+        }()
+        
+        
+        
+        elipseSignalView.center = center
+        containerView.addSubViews(elipseSignalView)
+
     }
 
 }
