@@ -57,7 +57,7 @@ class ViewController: UIViewController {
                 // Set the  m34 value for 3D effect
                 let perspective: CGFloat = 1.0 / 200.0  // Negative value for inward perspective
                 transformMatrix.m34 = perspective
-                transformMatrix = CATransform3DRotate(transformMatrix, CGFloat(-25 * Double.pi / 180), 1, 0, 0)
+                transformMatrix = CATransform3DRotate(transformMatrix, CGFloat(-20 * Double.pi / 180), 1, 0, 0)
             }else {
                 //Remove 3D transformation
                 transformMatrix = CATransform3DIdentity
@@ -72,12 +72,12 @@ class ViewController: UIViewController {
         vm = ViewModel(containerView: containerView)
         vm?.delegate = self
         
+//        containerView.backgroundColor = .green
+        
         setupGridView()
         
         setupViews()
         
-        
-        setAnchorPoint(anchorPoint: CGPoint(x: 0.5, y: 0.5), forView: containerView)
         setupAnimation()
         
         // Add the two-finger pan gesture to the containerView
@@ -86,9 +86,14 @@ class ViewController: UIViewController {
     
     func setupViews() {
         guard let vm = vm else {return}
+        
+        containerView.layer.anchorPoint = CGPoint(x: 0.5, y: 0.8)
+
+        
         vm.addADeviceView(
             device: Device(id: 10, name: "EP9108W-4FE", status: .green, deviceType: .modem, deviceImg: DeviceImg.modem),
-            coordinate: CGPoint(x: view.center.x, y: view.center.y + 30))
+            coordinate: self.view.convert(CGPoint(x: containerView.bounds.width/2, y: containerView.bounds.height/2), from: containerView) )
+        
 
 //        vm.addADeviceView(
 //            device: Device(id: 2, name: "Iphone X", status: .green, deviceType: .iphone, deviceImg: DeviceImg.iphone),
@@ -98,9 +103,9 @@ class ViewController: UIViewController {
 //            device: Device(id: 3, name: "Iphone X", status: .yellow, deviceType: .iphone, deviceImg: DeviceImg.iphone),
 //            coordinate: CGPoint(x: 110, y: 300))
     
-        vm.addADeviceView(
-            device: Device(id: 4, name: "Iphone X", status: .red, deviceType: .iphone, deviceImg: DeviceImg.iphone),
-            coordinate: CGPoint(x: 250, y: 100))
+//        vm.addADeviceView(
+//            device: Device(id: 4, name: "Iphone X", status: .red, deviceType: .iphone, deviceImg: DeviceImg.iphone),
+//            coordinate: CGPoint(x: 250, y: 100))
         
 
         var pointOfModem = vm.points.first(where: { point in
