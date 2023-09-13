@@ -38,11 +38,7 @@ class ViewModel {
     ///   - width: width of device view
     ///   - height: height of device view
     func addADeviceView( device: Device ,coordinate: CGPoint) {
-        let containerFrame = containerView.frame
-        
-        // Convert the given coordinate to a point within the containerView's coordinate system
-        let coordinateToContainerView = containerView.convert(coordinate, from: containerView.superview)
-        
+
         setupDeviceView(from: device, coordinate: coordinate, size: device.deviceSize)
     }
     
@@ -65,7 +61,15 @@ class ViewModel {
         let point = UIView(frame: CGRect(origin: containerView.convert(deviceViewModel.view
             .frame.origin, from: containerView.superview), size: CGSize(width: 2, height: 2) ) )
         
-        let pointOfDevice = Point(id: deviceViewModel.id, view: point,oriCoordinate: deviceViewModel.view.frame.origin)
+        if device.id == 10 {
+            point.backgroundColor = .red
+        }
+        
+        let pointOfDevice = Point(
+            id: deviceViewModel.id,
+            view: point,
+            oriCoordinate: deviceViewModel.view.frame.origin
+        )
         
         points.append(pointOfDevice)
         containerView.addSubview(point)
@@ -83,7 +87,7 @@ class ViewModel {
     func setupLanDevicesAndLanLines(modemCenterPoint: CGPoint,lanDevices: [Device]){
         
         //Vertical space between modem to devices
-        let verticalSpaceBetweenModemToDevices = 165.0
+        let verticalSpaceBetweenModemToDevices = 250.0
         
         //Calculate the arranged centers point of lan devices
         let centerOfLanDevices =  calculateLansCenters(parentView: containerView, modemCenterPoint: modemCenterPoint, verticalSpaceBetweenModemToDevices: verticalSpaceBetweenModemToDevices, deviceConnectLans: lanDevices)

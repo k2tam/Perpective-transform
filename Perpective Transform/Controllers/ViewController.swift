@@ -74,10 +74,11 @@ class ViewController: UIViewController {
         
         setupGridView()
         
+
+        
         setupViews()
         
         
-        setAnchorPoint(anchorPoint: CGPoint(x: 0.5, y: 0.5), forView: containerView)
         setupAnimation()
         
         // Add the two-finger pan gesture to the containerView
@@ -86,21 +87,22 @@ class ViewController: UIViewController {
     
     func setupViews() {
         guard let vm = vm else {return}
+        
+        
+//        containerView.backgroundColor = .green
+        
+        setAnchorPoint(anchorPoint: CGPoint(x: 0.5, y: 0.5), forView: containerView)
+
+        
         vm.addADeviceView(
             device: Device(id: 10, name: "EP9108W-4FE", status: .green, deviceType: .modem, deviceImg: DeviceImg.modem),
-            coordinate: CGPoint(x: view.center.x, y: view.center.y + 30))
-
-//        vm.addADeviceView(
-//            device: Device(id: 2, name: "Iphone X", status: .green, deviceType: .iphone, deviceImg: DeviceImg.iphone),
-//            coordinate: CGPoint(x: 90, y: 390))
+            coordinate: self.view.convert(CGPoint(x: containerView.bounds.width/2, y: containerView.bounds.height/2), from: containerView))
         
-//        vm.addADeviceView(
-//            device: Device(id: 3, name: "Iphone X", status: .yellow, deviceType: .iphone, deviceImg: DeviceImg.iphone),
-//            coordinate: CGPoint(x: 110, y: 300))
+
     
-        vm.addADeviceView(
-            device: Device(id: 4, name: "Iphone X", status: .red, deviceType: .iphone, deviceImg: DeviceImg.iphone),
-            coordinate: CGPoint(x: 250, y: 100))
+//        vm.addADeviceView(
+//            device: Device(id: 4, name: "Iphone X", status: .red, deviceType: .iphone, deviceImg: DeviceImg.iphone),
+//            coordinate: CGPoint(x: 250, y: 100))
         
 
         var pointOfModem = vm.points.first(where: { point in
