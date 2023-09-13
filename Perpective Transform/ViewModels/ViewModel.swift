@@ -30,13 +30,8 @@ class ViewModel {
     
     /// Add device view to devices array to place in container view
     /// - Parameters:
-    ///   - containerView: container view to place device view
-    ///   - deviceID: device ID
-    ///   - deviceName: device name
-    ///   - deviceImg: image string of device in assets
     ///   - coordinate: coordinate center of device view to screen coordinate
-    ///   - width: width of device view
-    ///   - height: height of device view
+
     func addADeviceView( device: Device ,coordinate: CGPoint) {
 
         setupDeviceView(from: device, coordinate: coordinate, size: device.deviceSize)
@@ -48,18 +43,22 @@ class ViewModel {
     ///   - coordinate: coordinate center of device view to screen cordinate
     private func setupDeviceView(from device: Device, coordinate: CGPoint, size: CGSize) {
         let deviceView = DeviceView()
-        
         deviceView.configure(from: device)
         
         //Set fit width for label deivce
         let widthDeviceFrameFitLabel =  deviceView.getWidthThatFitTextInLabel() + 20
+        
         deviceView.frame = CGRect(x: coordinate.x, y: coordinate.y, width: widthDeviceFrameFitLabel, height: size.height)
         
         let deviceViewModel = DeviceViewModel(id: device.id, view: deviceView, coordinate: coordinate)
         
         //Point in containerView coordinate system
-        let point = UIView(frame: CGRect(origin: containerView.convert(deviceViewModel.view
-            .frame.origin, from: containerView.superview), size: CGSize(width: 2, height: 2) ) )
+        let point = UIView(
+            frame: CGRect(
+                origin: containerView.convert(deviceViewModel.view.frame.origin,from: containerView.superview),
+                size: CGSize(width: 2, height: 2)
+            )
+        )
         
         if device.id == 10 {
             point.backgroundColor = .red
@@ -77,6 +76,7 @@ class ViewModel {
         deviceViewModel.view.center = pointOfDevice.oriCoordinate
         
         delegate?.completeSetupPointAndDeviceView(deviceView: deviceViewModel.view)
+        
         deviceViews.append(DeviceViewModel(id: device.id, view: deviceView, coordinate: coordinate))
     }
     
@@ -146,7 +146,6 @@ class ViewModel {
                 }
             }
         }
-        
     }
     
     func addAStraightLanLine(spaceToLanDevice: CGFloat,startPoint: CGPoint, endPoint: CGPoint){
@@ -249,7 +248,6 @@ class ViewModel {
 
          ])
         
-         
         let pointOfModem = points.first(where: { point in
              return point.id == 10
         })
@@ -258,41 +256,16 @@ class ViewModel {
              return
          }
         
-         
          var circleStrongRadius = 120.0
          
-         
-         
-         
-         
+
         let circleStrong = CircleView(
             frame: CGRect(x: 0, y: 0, width: circleStrongRadius * 2, height: circleStrongRadius * 2),
             gradientStartPoint: CGPoint(x: 0.5, y: 0),
             gradientEndPoint: CGPoint(x: 0.5, y: 1.5))
         
         circleStrong.center = pointOfModem.view.center
-  
-         
-         
-         
-//
-//        let circleMedium = CGPoint(x: centerContainerViewX, y: startLineOfSignal - 150)
-//        let circle2 = CircleView(
-//            frame: CGRect(x: 0, y: 0, width: 500, height: 450),
-//            gradientStartPoint: CGPoint(x: 0.5, y: 0),
-//            gradientEndPoint: CGPoint(x: 0.5, y: 1))
 
-        //        circle2.center = CGPoint(x: signalViewCenter2.x, y: signalViewCenter2.y)
-        //
-        //        let signalViewCenter3 = CGPoint(x: centerContainerViewX, y: startLineOfSignal - 300)
-        //        let circle3 = CircleView(
-        //            frame: CGRect(x: 0, y: 0, width: 600, height: 450),
-        //            gradientStartPoint: CGPoint(x: 0.5, y: 0),
-        //            gradientEndPoint: CGPoint(x: 0.5, y: 1))
-        //
-        //        circle3.center = CGPoint(x: signalViewCenter3.x, y: signalViewCenter3.y)
-        
-        
         containerView.addSubViews(circleStrong)
          
          var strongDevices = devices.filter { device in
